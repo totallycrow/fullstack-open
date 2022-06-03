@@ -21,17 +21,21 @@ const App = (props) => {
 
 
   const addNote = (event) => {
-    event.preventDefault();
+    event.preventDefault()
     const noteObject = {
       content: newNote,
-      date: new Date().toISOString(),
+      date: new Date(),
       important: Math.random() < 0.5,
-      id: notes.length + 1,
-    };
-
-    setNotes(notes.concat(noteObject));
-    setNewNote("");
-  };
+    }
+  
+    axios
+      .post('http://localhost:3001/notes', noteObject)
+      .then(response => {
+        console.log(response)
+        setNotes(notes.concat(response.data))
+        setNewNote('')
+      })
+  }
 
   const handleNoteChange = (event) => {
     console.log(event.target.value);

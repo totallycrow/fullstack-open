@@ -3,6 +3,7 @@ import Filter from "./components/Filter";
 import PersonForm from "./components/PersonForm";
 import Persons from "./components/Persons";
 import axios from 'axios'; 
+import recordsServices from "./services/records"
 
 const App = () => {
   const [persons, setPersons] = useState([]);
@@ -13,12 +14,18 @@ const App = () => {
   // Fetch data
   useEffect(() => {
 
-    axios.get("http://localhost:3001/persons").then(response => {
-      setPersons(response.data)
-    })
+    recordsServices.getAll().then(response => setPersons(response))
+
+    // axios.get("http://localhost:3001/persons").then(response => {
+    //   setPersons(response.data)
+    // })
+
+    
 
 
   }, [])
+
+  console.log(recordsServices.getAll())
 
   // INPUT HANDLERS
   const handleNameChange = (event) => {
@@ -41,7 +48,12 @@ const App = () => {
 
     persons.find((element) => element.name === newRecord.name)
       ? alert(`${newRecord.name} is already in the phonebook`)
-      : setPersons(persons.concat(newRecord));
+      : axios
+      .post('http://localhost:3001/persons', newRecord)
+      .then(response => setPersons(persons.concat(response.data)))
+
+      
+      // setPersons(persons.concat(newRecord));
 
     setNewName("");
   };

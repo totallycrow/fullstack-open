@@ -38,6 +38,21 @@ const App = () => {
 
   const onFilterChange = (event) => setFilter(event.target.value);
 
+  
+
+  const handleDelete = (id) => {
+
+    if(window.confirm("u sure?")) {
+
+    const url = `http://localhost:3001/persons/${id}`
+    
+    const promise = axios.delete(url)
+    promise.then(setPersons(persons.filter(person => person.id !== id)))
+  }
+    
+
+  }
+
   // *****************************
 
   // Form Handler
@@ -46,8 +61,16 @@ const App = () => {
 
     const newRecord = { name: newName, number: newNumber };
 
-    persons.find((element) => element.name === newRecord.name)
-      ? alert(`${newRecord.name} is already in the phonebook`)
+    const updateRecord = (record) => {
+      if(window.confirm(`${newRecord.name} is already in the phonebook. Update?`)) {
+        axios.put(`http://localhost:3001/persons/${record.id}`, {...record, number: newNumber} ).then(setPersons(persons.map(person => person.id !== record.id ? person : newRecord)))
+      }
+    }
+
+    const checkedRecord = persons.find((element) => element.name === newRecord.name)
+
+
+      checkedRecord ? updateRecord(checkedRecord)
       : axios
       .post('http://localhost:3001/persons', newRecord)
       .then(response => setPersons(persons.concat(response.data)))
@@ -73,7 +96,7 @@ const App = () => {
       />
 
       <h2>Numbers (Test From Remote)</h2>
-      <Persons filter={filter} persons={persons} />
+      <Persons filter={filter} persons={persons} handleDelete={handleDelete}/>
     </div>
   );
 };

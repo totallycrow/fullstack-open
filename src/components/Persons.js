@@ -1,7 +1,7 @@
 import axios from "axios";
 import React from "react";
 
-export default function Persons({ filter, persons }) {
+export default function Persons({ filter, persons, handleDelete }) {
   const recordsToShow =
     filter === ""
       ? persons
@@ -9,20 +9,13 @@ export default function Persons({ filter, persons }) {
           person.name.toUpperCase().includes(filter.toUpperCase())
         );
 
-  const handleDelete = (id) => {
-
-    axios.delete(`http://localhost:3001/persons/${id}`)
-    
-
-    
-
-  }
+  
   return (
     <div>
       <ul>
         {recordsToShow.map((person) => (
           <li key={person.name}>
-          {person.name} {person.number} <button onClick={handleDelete}>Delete</button>
+          {person.name} {person.number} <button onClick={() => handleDelete(person.id)}>Delete</button>
         </li>
           
         ))}

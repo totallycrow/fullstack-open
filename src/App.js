@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import Note from "./components/Note";
-import axios from "axios";
 
-const baseUrl = "api/notes";
+import noteService from "./services/notes";
 
 const App = (props) => {
   const [notes, setNotes] = useState([]);
@@ -10,10 +9,8 @@ const App = (props) => {
   const [showAll, setShowAll] = useState(true);
 
   useEffect(() => {
-    console.log("effect");
-    axios.get(baseUrl).then((response) => {
-      console.log("promise fulfilled");
-      setNotes(response.data);
+    noteService.getAll().then((initialNotes) => {
+      setNotes(initialNotes);
     });
   }, []);
 
@@ -27,9 +24,8 @@ const App = (props) => {
       important: Math.random() < 0.5,
     };
 
-    axios.post(baseUrl, noteObject).then((response) => {
-      console.log(response);
-      setNotes(notes.concat(response.data));
+    noteService.create(noteObject).then((returnedNote) => {
+      setNotes(notes.concat(returnedNote));
       setNewNote("");
     });
   };
@@ -44,13 +40,20 @@ const App = (props) => {
     : notes.filter((note) => note.important === true);
 
   const toggleImportanceOf = (id) => {
-    const url = baseUrl + id;
     const note = notes.find((n) => n.id === id);
     const changedNote = { ...note, important: !note.important };
 
-    axios.put(url, changedNote).then((response) => {
-      setNotes(notes.map((note) => (note.id !== id ? note : response.data)));
-    });
+    noteService
+      .update(id, changedNote)
+      .then((returnedNote) => {
+        setNotes(notes.map((note) => (note.id !== id ? note : returnedNote)));
+      })
+      .catch((error) => {
+        console.log(
+          `the note '${note.content}' was already deleted from server`
+        );
+        setNotes(notes.filter((n) => n.id !== id));
+      });
   };
   return (
     <div>

@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import Note from "./components/Note";
-import axios from "axios";
 import noteService from "./services/notes";
 import Notification from "./components/Notification";
 
@@ -24,7 +23,7 @@ const App = (props) => {
   const [notes, setNotes] = useState([]);
   const [newNote, setNewNote] = useState("a new note");
   const [showAll, setShowAll] = useState(true);
-  const [errorMessage, setErrorMessage] = useState("some error happened...");
+  const [errorMessage, setErrorMessage] = useState(null);
 
   useEffect(() => {
     noteService.getAll().then((initialNotes) => {

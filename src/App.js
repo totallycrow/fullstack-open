@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import Filter from "./components/Filter";
 import PersonForm from "./components/PersonForm";
 import Persons from "./components/Persons";
-import axios from 'axios'; 
-import recordsServices from "./services/records"
+import axios from "axios";
+import recordsServices from "./services/records";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
@@ -13,19 +13,12 @@ const App = () => {
 
   // Fetch data
   useEffect(() => {
-
-    recordsServices.getAll().then(response => setPersons(response))
+    recordsServices.getAll().then((response) => setPersons(response));
 
     // axios.get("http://localhost:3001/persons").then(response => {
     //   setPersons(response.data)
     // })
-
-    
-
-
-  }, [])
-
-  console.log(recordsServices.getAll())
+  }, []);
 
   // INPUT HANDLERS
   const handleNameChange = (event) => {
@@ -38,20 +31,20 @@ const App = () => {
 
   const onFilterChange = (event) => setFilter(event.target.value);
 
-  
-
   const handleDelete = (id) => {
+    if (window.confirm("u sure?")) {
+      const url = `http://localhost:3001/api/persons/${id}`;
 
-    if(window.confirm("u sure?")) {
-
-    const url = `http://localhost:3001/persons/${id}`
-    
-    const promise = axios.delete(url)
-    promise.then(setPersons(persons.filter(person => person.id !== id)))
-  }
-    
-
-  }
+      const promise = axios.delete(url);
+      promise.then(
+        setPersons(persons.filter((person) => person.id !== id)).catch(
+          (error) => {
+            console.log(error);
+          }
+        )
+      );
+    }
+  };
 
   // *****************************
 
@@ -62,21 +55,35 @@ const App = () => {
     const newRecord = { name: newName, number: newNumber };
 
     const updateRecord = (record) => {
-      if(window.confirm(`${newRecord.name} is already in the phonebook. Update?`)) {
-        axios.put(`http://localhost:3001/persons/${record.id}`, {...record, number: newNumber} ).then(setPersons(persons.map(person => person.id !== record.id ? person : newRecord)))
+      if (
+        window.confirm(`${newRecord.name} is already in the phonebook. Update?`)
+      ) {
+        axios
+          .put(`http://localhost:3001/api/persons/${record.id}`, {
+            ...record,
+            number: newNumber,
+          })
+          .then(
+            setPersons(
+              persons.map((person) =>
+                person.id !== record.id ? person : newRecord
+              )
+            )
+          );
       }
-    }
+    };
 
-    const checkedRecord = persons.find((element) => element.name === newRecord.name)
+    const checkedRecord = persons.find(
+      (element) => element.name === newRecord.name
+    );
 
-
-      checkedRecord ? updateRecord(checkedRecord)
+    checkedRecord
+      ? updateRecord(checkedRecord)
       : axios
-      .post('http://localhost:3001/persons', newRecord)
-      .then(response => setPersons(persons.concat(response.data)))
+          .post("http://localhost:3001/api/persons", newRecord)
+          .then((response) => setPersons(persons.concat(response.data)));
 
-      
-      // setPersons(persons.concat(newRecord));
+    // setPersons(persons.concat(newRecord));
 
     setNewName("");
   };
@@ -96,7 +103,7 @@ const App = () => {
       />
 
       <h2>Numbers (Test From Remote)</h2>
-      <Persons filter={filter} persons={persons} handleDelete={handleDelete}/>
+      <Persons filter={filter} persons={persons} handleDelete={handleDelete} />
     </div>
   );
 };

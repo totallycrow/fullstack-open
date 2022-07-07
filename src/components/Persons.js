@@ -9,15 +9,14 @@ export default function Persons({ filter, persons, handleDelete }) {
           person.name.toUpperCase().includes(filter.toUpperCase())
         );
 
-  
   return (
     <div>
       <ul>
         {recordsToShow.map((person) => (
           <li key={person.name}>
-          {person.name} {person.number} <button onClick={() => handleDelete(person.id)}>Delete</button>
-        </li>
-          
+            {person.name} {person.number}{" "}
+            <button onClick={() => handleDelete(person.id)}>Delete</button>
+          </li>
         ))}
       </ul>
     </div>

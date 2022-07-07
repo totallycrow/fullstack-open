@@ -11,6 +11,8 @@ const App = () => {
   const [newNumber, setNewNumber] = useState("");
   const [filter, setFilter] = useState("");
 
+  const baseUrl = "http://localhost:3001/api/persons";
+
   // Fetch data
   useEffect(() => {
     recordsServices.getAll().then((response) => setPersons(response));
@@ -33,16 +35,16 @@ const App = () => {
 
   const handleDelete = (id) => {
     if (window.confirm("u sure?")) {
-      const url = `http://localhost:3001/api/persons/${id}`;
+      const url = `${baseUrl}/${id}`;
 
       const promise = axios.delete(url);
-      promise.then(
-        setPersons(persons.filter((person) => person.id !== id)).catch(
-          (error) => {
-            console.log(error);
-          }
-        )
-      );
+      promise
+        .then(() => {
+          setPersons(persons.filter((person) => person.id !== id));
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     }
   };
 
@@ -59,7 +61,7 @@ const App = () => {
         window.confirm(`${newRecord.name} is already in the phonebook. Update?`)
       ) {
         axios
-          .put(`http://localhost:3001/api/persons/${record.id}`, {
+          .put(`${baseUrl}/${record.id}`, {
             ...record,
             number: newNumber,
           })
@@ -80,7 +82,7 @@ const App = () => {
     checkedRecord
       ? updateRecord(checkedRecord)
       : axios
-          .post("http://localhost:3001/api/persons", newRecord)
+          .post(baseUrl, newRecord)
           .then((response) => setPersons(persons.concat(response.data)));
 
     // setPersons(persons.concat(newRecord));
